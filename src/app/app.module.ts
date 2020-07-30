@@ -7,6 +7,7 @@ import { MainComponent } from './components/main/main.component';
 import { MainHeaderComponent } from './components/main-header/main-header.component';
 import { MainContentComponent } from './components/main-content/main-content.component';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    BrowserAnimationsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
