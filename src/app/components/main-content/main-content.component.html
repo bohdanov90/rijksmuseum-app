@@ -1,0 +1,7 @@
+<mat-grid-list cols='5' rowHeight='5:6' gutterSize='5px' style="width: 900px">
+  <mat-grid-tile *ngFor="let artObject of allObjects$ | async">
+    <mat-card style="width: 120px">
+      <img mat-card-image src="{{ artObject[headerImage][url] }}" alt="">
+    </mat-card>
+  </mat-grid-tile>
+</mat-grid-list>

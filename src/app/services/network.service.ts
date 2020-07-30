@@ -18,10 +18,10 @@ export class NetworkService {
   constructor(private http: HttpClient) {}
 
   private getQuery(query: string): Observable<object> {
-    return this.http.get(`https://www.rijksmuseum.nl/api/en/collection?key=${this.apiKey}&q=${query}`);
+    return this.http.get(`https://www.rijksmuseum.nl/api/en/collection?key=${this.apiKey}&q=${query}&ps=100`);
   }
 
-  private getAllArtObjects(query: string) {
+  public getAllArtObjects(query: string) {
     return this.getQuery(query).pipe(
       map(response => response[this.artObjects])
     );
