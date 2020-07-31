@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { PageEvent } from '@angular/material/paginator';
 
 @Injectable({
   providedIn: 'root'
@@ -17,25 +18,15 @@ export class NetworkService {
 
   constructor(private http: HttpClient) {}
 
-  private getQuery(query: string): Observable<object> {
-    return this.http.get(`https://www.rijksmuseum.nl/api/en/collection?key=${this.apiKey}&q=${query}&ps=100`);
+  public getQuery(query: string, numOfPages: number, resPerPage: number): Observable<object> {
+    return this.http.get(
+      `https://www.rijksmuseum.nl/api/en/collection?key=${this.apiKey}&q=${query}&p=${numOfPages}&ps=${resPerPage}`
+    );
   }
 
-  public getAllArtObjects(query: string) {
-    return this.getQuery(query).pipe(
+  public getAllArtObjects(query: string, numOfPages: number, resPerPage: number): Observable<object> {
+    return this.getQuery(query, numOfPages, resPerPage).pipe(
       map(response => response[this.artObjects])
-    );
-  }
-
-  public getHeaderImage(query: string): Observable<string> {
-    return this.getAllArtObjects(query).pipe(
-      map(artObjects => artObjects.map(el => el[this.headerImage][this.url]))
-    );
-  }
-
-  public getTitle(query: string): Observable<string> {
-    return this.getAllArtObjects(query).pipe(
-      map(artObjects => artObjects.map(el => el[this.title]))
     );
   }
 }

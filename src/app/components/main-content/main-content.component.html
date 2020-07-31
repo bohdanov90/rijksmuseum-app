@@ -1,7 +1,16 @@
-<mat-grid-list cols='5' rowHeight='5:6' gutterSize='5px' style="width: 900px">
-  <mat-grid-tile *ngFor="let artObject of allObjects$ | async">
+<mat-grid-list cols='5' rowHeight='5:6' gutterSize='5px' style="width: 90%">
+  <mat-grid-tile *ngFor="let artObject of dataSource">
     <mat-card style="width: 120px">
       <img mat-card-image src="{{ artObject[headerImage][url] }}" alt="">
     </mat-card>
   </mat-grid-tile>
 </mat-grid-list>
+
+<mat-paginator
+  [length]='itemsLength'
+  [pageIndex]='pageIndex'
+  [pageSize]='pageSize'
+  [pageSizeOptions]='pageSizeOptions'
+  showFirstLastButtons
+  (page)='pageEvent = getServerData($event)'>
+</mat-paginator>

@@ -4,4 +4,5 @@ export enum NetworkQueries {
   URL = 'url',
   LONG_TITLE = 'longTitle',
   TITLE = 'title',
+  COUNT = 'count',
 }
