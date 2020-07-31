@@ -21,6 +21,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public sort = NetworkQueries.SORT;
 
   public sortValues = this.formValuesService.sortValues;
+  public displayData: boolean;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   public dataSource: DataSourceService;
@@ -46,7 +47,12 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       tap(() => this.loadDataPage()),
     ).subscribe();
 
-    this.getFormData().pipe(takeUntil(this.onDestroy$)).subscribe(el => this.data = el);
+    this.getFormData().pipe(
+      takeUntil(this.onDestroy$),
+      ).subscribe(el => {
+        this.data = el;
+        this.toggleDataDisplay();
+      });
   }
 
   ngOnDestroy(): void {
@@ -68,8 +74,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public getFormData() {
     return this.formValuesService.getValues$().pipe(
       tap(query => console.log(query)),
-      mergeMap(query => {
-        if (!query) {
+      mergeMap(response => {
+        if (!response) {
           return this.dataSource.loadData(
             '',
             this.paginator.pageIndex,
@@ -77,9 +83,15 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
             this.formValuesService.sortValues[0].apiName
           );
         } else {
-          return this.dataSource.loadData(query[this.search], this.paginator.pageIndex, this.paginator.pageSize, query[this.sort]);
+          return this.dataSource.loadData(response[this.search], this.paginator.pageIndex, this.paginator.pageSize, response[this.sort]);
         }
       }),
     );
+  }
+
+  public toggleDataDisplay() {
+    if (this.data !== undefined && this.data !== null) {
+      this.data.count === 0 ? this.displayData = false : this.displayData = true;
+    }
   }
 }

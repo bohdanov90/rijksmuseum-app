@@ -39,7 +39,7 @@ export class DataSourceService extends DataSource<any> {
     return this.networkService.getQuery(query, numOfPages, resPerPage, sort).pipe(
       catchError(() => of([])),
       tap(data => {
-        console.log(data);
+        // console.log(data);
         return this.dataSubject$.next(data);
       }),
     );
