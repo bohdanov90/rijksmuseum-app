@@ -1,0 +1,11 @@
+<form [formGroup]='form' (ngSubmit)='submitForm()'>
+  <select formControlName="sort">
+    <option *ngFor='let value of sortValues' [value]='value.apiName'>{{ value.displayName }}</option>
+  </select>
+  <input
+    type="text"
+    name="search"
+    formControlName="search"
+    placeholder="Search keyword...">
+  <button type='submit'>Search</button>
+</form>
