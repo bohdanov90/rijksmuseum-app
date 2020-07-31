@@ -1,6 +1,6 @@
 import { NetworkQueries } from './../enums/network-queries.enum';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PageEvent } from '@angular/material/paginator';
@@ -18,15 +18,16 @@ export class NetworkService {
 
   constructor(private http: HttpClient) {}
 
-  public getQuery(query: string, numOfPages: number, resPerPage: number): Observable<object> {
+  public getQuery(query: string, numOfPages: number = 0, resPerPage: number = 10, sort: string = 'relevance'): Observable<object> {
     return this.http.get(
-      `https://www.rijksmuseum.nl/api/en/collection?key=${this.apiKey}&q=${query}&p=${numOfPages}&ps=${resPerPage}`
-    );
-  }
-
-  public getAllArtObjects(query: string, numOfPages: number, resPerPage: number): Observable<object> {
-    return this.getQuery(query, numOfPages, resPerPage).pipe(
-      map(response => response[this.artObjects])
+      `https://www.rijksmuseum.nl/api/en/collection`, {
+        params: new HttpParams()
+          .set('key', this.apiKey)
+          .set('q', query.toString())
+          .set('p', numOfPages.toString())
+          .set('ps', resPerPage.toString())
+          .set('s', sort.toString())
+      }
     );
   }
 }

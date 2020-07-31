@@ -1,39 +1,46 @@
 import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
-import { tap, takeUntil, map } from 'rxjs/operators';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { tap, takeUntil } from 'rxjs/operators';
+import { MatPaginator } from '@angular/material/paginator';
+import { DataSourceService } from 'src/app/services/data-source.service';
 
 @Component({
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss']
 })
-export class MainContentComponent implements OnInit, OnDestroy {
+export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public headerImage = NetworkQueries.HEADER_IMAGE;
   public url = NetworkQueries.URL;
-
-  public pageEvent: PageEvent;
-  public dataSource: null;
-  public itemsLength: number;
-  public pageIndex: number;
-  public pageSize: number;
-  public pageSizeOptions = [10, 15, 25, 50, 100];
-
-  public initialNumOfPages = 0;
-  public initialResPerPage = 10;
-
   public artObjects = NetworkQueries.ART_OBJECTS;
   public count = NetworkQueries.COUNT;
 
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  public dataSource: DataSourceService;
+  public pageSizeOptions = [10, 20, 50, 100];
+  public data: any;
+  public initialNumOfPages = 0;
+  public initialResPerPage = 10;
+
   private onDestroy$: Subject<void> = new Subject<void>();
 
-  constructor(private networkService: NetworkService) {}
+  constructor(
+    public networkService: NetworkService,
+    ) {}
 
   ngOnInit(): void {
-    this.getServerData();
+    this.dataSource = new DataSourceService(this.networkService);
+    this.dataSource.loadData('Rembrandt').pipe(
+      takeUntil(this.onDestroy$)
+    ).subscribe(el => this.data = el);
+  }
+
+  ngAfterViewInit() {
+    this.paginator.page.pipe(
+      tap(() => this.loadDataPage()),
+    ).subscribe();
   }
 
   ngOnDestroy(): void {
@@ -41,28 +48,9 @@ export class MainContentComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  public getServerData(event?: PageEvent) {
-    if (!event) {
-      this.networkService.getQuery('Rembrandt', this.initialNumOfPages, this.initialResPerPage).pipe(
-        tap(response => {
-        this.dataSource = response[this.artObjects];
-        this.itemsLength = response[this.count];
-        }),
-        takeUntil(this.onDestroy$),
-      ).subscribe();
-    } else {
-      this.networkService.getQuery('Rembrandt', event?.pageIndex, event?.pageSize).pipe(
-        tap(response => {
-        this.dataSource = response[this.artObjects];
-        this.itemsLength = response[this.count];
-
-        this.pageIndex = event.pageIndex;
-        this.pageSize = event.pageSize;
-        }),
-        takeUntil(this.onDestroy$),
-      ).subscribe();
-    }
-
-    return event;
+  public loadDataPage() {
+    this.dataSource.loadData('Rembrandt', this.paginator.pageIndex, this.paginator.pageSize, 'relevance').pipe(
+      takeUntil(this.onDestroy$)
+    ).subscribe(el => this.data = el);
   }
 }
