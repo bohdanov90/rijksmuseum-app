@@ -30,6 +30,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public initialNumOfPages = this.dataSourceService.initialNumOfPages;
   public initialResPerPage = this.dataSourceService.initialResPerPage;
 
+  public displayOnHover = false;
+
   private onDestroy$: Subject<void> = new Subject<void>();
 
   constructor(
@@ -93,5 +95,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.data !== undefined && this.data !== null) {
       this.data.count === 0 ? this.displayData = false : this.displayData = true;
     }
+  }
+
+  public onHover() {
+    this.displayOnHover = true;
+  }
+
+  public offHover() {
+    this.displayOnHover = false;
   }
 }

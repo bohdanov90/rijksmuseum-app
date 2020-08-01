@@ -3,10 +3,13 @@
 </div>
 
 <ng-template #displayDataBlock>
-  <mat-grid-list cols='5' rowHeight='5:6' gutterSize='5px' style="width: 90%">
-    <mat-grid-tile *ngFor="let artObject of data?.artObjects">
-      <mat-card style="width: 120px">
-        <img mat-card-image src="{{ artObject[headerImage][url] }}" alt="">
+  <mat-grid-list cols='6' gutterSize='5px' class="mat-grid-list">
+    <mat-grid-tile *ngFor="let artObject of data?.artObjects" class="mat-grid-tile">
+      <mat-card style="width: 150px" class="mat-card">
+        <div class="mat-card-image" (mouseenter)='onHover()' (mouseleave)='offHover()'>
+          <img mat-card-image src="{{ artObject[headerImage][url] }}" alt="" class="image">
+        </div>
+        <div class="mat-tooltip" *ngIf='displayOnHover === true'>{{ artObject.longTitle }}</div>
       </mat-card>
     </mat-grid-tile>
   </mat-grid-list>
