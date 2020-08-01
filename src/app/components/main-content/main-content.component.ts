@@ -6,6 +6,8 @@ import { tap, takeUntil, mergeMap } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { DataSourceService } from 'src/app/services/data-source.service';
 import { FormValuesService } from '../../services/form-values.service';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { DetailsComponent } from '../details/details.component';
 
 @Component({
   selector: 'app-main-content',
@@ -31,6 +33,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public initialResPerPage = this.dataSourceService.initialResPerPage;
 
   public displayOnHover = false;
+  public clickedArtObject;
 
   private onDestroy$: Subject<void> = new Subject<void>();
 
@@ -38,6 +41,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     public networkService: NetworkService,
     public formValuesService: FormValuesService,
     public dataSourceService: DataSourceService,
+    public matDialog: MatDialog,
     ) {}
 
   ngOnInit(): void {
@@ -103,5 +107,26 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public offHover() {
     this.displayOnHover = false;
+  }
+
+  public getDetailedData(event) {
+    this.data.artObjects.map(el => {
+      if (event.target.currentSrc === el.headerImage.url) {
+        this.clickedArtObject = el;
+      }
+    });
+
+    this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).subscribe(el => console.log(el));
+  }
+
+  public openDialog() {
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = true;
+    dialogConfig.autoFocus = true;
+    dialogConfig.hasBackdrop = true;
+    dialogConfig.closeOnNavigation = true;
+    dialogConfig.data = this.clickedArtObject;
+
+    this.matDialog.open(DetailsComponent, dialogConfig);
   }
 }

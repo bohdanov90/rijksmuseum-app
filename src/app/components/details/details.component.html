@@ -1,0 +1,9 @@
+<h2 mat-dialog-title> {{ title }} </h2>>
+<mat-dialog-content class='mat-dialog-content'>
+  <div><img src='{{ webImage }}' alt="" class="img"></div>
+  <div>{{ description }}</div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button class="mat-raised-button" (click)='viewDetails()'>View more details</button>
+  <button class="mat-raised-button" (click)='closeDialog()'>Close</button>
+</mat-dialog-actions>
