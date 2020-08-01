@@ -10,7 +10,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { ReactiveFormsModule } from '@angular/forms';
-import { DetailsComponent } from './components/details/details.component';
+import { PopupComponent } from './components/popup/popup.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +18,7 @@ import { DetailsComponent } from './components/details/details.component';
     MainComponent,
     MainHeaderComponent,
     MainContentComponent,
-    DetailsComponent,
+    PopupComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,6 +30,6 @@ import { DetailsComponent } from './components/details/details.component';
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [DetailsComponent],
+  entryComponents: [PopupComponent],
 })
 export class AppModule { }

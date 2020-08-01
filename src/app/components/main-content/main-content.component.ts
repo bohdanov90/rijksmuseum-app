@@ -2,12 +2,13 @@ import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular
 import { Subject } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
-import { tap, takeUntil, mergeMap, take } from 'rxjs/operators';
+import { tap, takeUntil, mergeMap, take, catchError } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { DataSourceService } from 'src/app/services/data-source.service';
 import { FormValuesService } from '../../services/form-values.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { DetailsComponent } from '../details/details.component';
+import { PopupComponent } from '../popup/popup.component';
+import { ClickedDataService } from '../../services/clicked-data.service';
 
 @Component({
   selector: 'app-main-content',
@@ -42,7 +43,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     public formValuesService: FormValuesService,
     public dataSourceService: DataSourceService,
     public matDialog: MatDialog,
-    ) {}
+    private clickedDataService: ClickedDataService,
+  ) {}
 
   ngOnInit(): void {
     this.dataSource = new DataSourceService(this.networkService, this.formValuesService);
@@ -110,10 +112,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.data.artObjects.map(el => {
       if (event.target.currentSrc === el.headerImage.url) {
         this.clickedArtObject = el;
+        this.clickedDataService.setValues(el);
       }
     });
 
-    this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).pipe(takeUntil(this.onDestroy$)).subscribe();
+    this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).pipe(
+      takeUntil(this.onDestroy$),
+    ).subscribe();
   }
 
   public openDialog() {
@@ -124,6 +129,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogConfig.closeOnNavigation = true;
     dialogConfig.data = this.clickedArtObject;
 
-    this.matDialog.open(DetailsComponent, dialogConfig);
+    this.matDialog.open(PopupComponent, dialogConfig);
   }
 }

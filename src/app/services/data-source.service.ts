@@ -37,7 +37,6 @@ export class DataSourceService extends DataSource<any> {
     sort = this.formValuesService.sortValues[0].apiName
   ) {
     return this.networkService.getQuery(query, numOfPages, resPerPage, sort).pipe(
-      catchError(() => of([])),
       tap(data => {
         // console.log(data);
         return this.dataSubject$.next(data);
