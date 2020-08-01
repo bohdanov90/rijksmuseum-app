@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular
 import { Subject } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
-import { tap, takeUntil, mergeMap } from 'rxjs/operators';
+import { tap, takeUntil, mergeMap, take } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { DataSourceService } from 'src/app/services/data-source.service';
 import { FormValuesService } from '../../services/form-values.service';
@@ -51,14 +51,16 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.paginator.page.pipe(
       tap(() => this.loadDataPage()),
+      takeUntil(this.onDestroy$),
     ).subscribe();
 
     this.getFormData().pipe(
       takeUntil(this.onDestroy$),
-      ).subscribe(el => {
+    ).subscribe(el => {
         this.data = el;
         this.toggleDataDisplay();
-      });
+        this.paginator.pageIndex = 0;
+    });
   }
 
   ngOnDestroy(): void {
@@ -67,19 +69,14 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public loadDataPage() {
-    this.dataSource.loadData(
-      '',
-      this.paginator.pageIndex,
-      this.paginator.pageSize,
-      this.formValuesService.sortValues[0].apiName
-    ).pipe(
-      takeUntil(this.onDestroy$)
-    ).subscribe(el => this.data = el);
+    return this.getFormData().pipe(
+      take(1),
+      takeUntil(this.onDestroy$),
+      ).subscribe(el => this.data = el);
   }
 
   public getFormData() {
     return this.formValuesService.getValues$().pipe(
-      tap(query => console.log(query)),
       mergeMap(response => {
         if (!response) {
           return this.dataSource.loadData(
@@ -116,7 +113,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).subscribe(el => console.log(el));
+    this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).pipe(takeUntil(this.onDestroy$)).subscribe();
   }
 
   public openDialog() {
