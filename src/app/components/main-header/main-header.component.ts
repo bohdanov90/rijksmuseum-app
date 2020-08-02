@@ -11,18 +11,17 @@ import { DataService } from '../../services/data.service';
 })
 export class MainHeaderComponent {
   public sortValues = this.dataService.sortValues;
-
-  form: FormGroup = new FormGroup({
+  public form: FormGroup = new FormGroup({
     sort: new FormControl(NetworkQueries.RELEVANCE),
     search: new FormControl(''),
   });
 
   constructor(
-    public formValuesService: FormValuesService,
+    private formValuesService: FormValuesService,
     private dataService: DataService,
   ) {}
 
-  submitForm() {
+  public submitForm(): void {
     this.formValuesService.setValues(this.form.value);
   }
 }

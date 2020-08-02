@@ -12,7 +12,7 @@ export class NavigationService {
     private router: Router,
   ) {}
 
-  public navigateMain(query, numOfPages, resPerPage, sort) {
+  public navigateMain(query: string, numOfPages: number, resPerPage: number, sort: string): void {
     this.router.navigate([Routing.MAIN], { queryParams: {
       key: this.networkService.apiKey,
       q: query,
@@ -22,7 +22,7 @@ export class NavigationService {
     }});
   }
 
-  public navigateDetails(objectNumber) {
+  public navigateDetails(objectNumber: string): void {
     this.router.navigate([`/api/en/collection/${objectNumber}`], { queryParams:
       { key: this.networkService.apiKey }
     });

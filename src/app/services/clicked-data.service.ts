@@ -5,15 +5,13 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ClickedDataService {
-  public clickedObjectData$: BehaviorSubject<string> = new BehaviorSubject(null);
+  private clickedObjectData$: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  constructor() { }
-
-  setValues(data: any): void {
+  public setValues(data): void {
     this.clickedObjectData$.next(data);
   }
 
-  getValues$(): Observable<any> {
+  public getValues$(): Observable<any> {
     return this.clickedObjectData$.asObservable();
   }
 }

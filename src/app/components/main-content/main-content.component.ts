@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Component, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Subject, Observable } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
 import { tap, takeUntil, mergeMap, take } from 'rxjs/operators';
@@ -8,9 +8,11 @@ import { FormValuesService } from '../../services/form-values.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PopupComponent } from '../popup/popup.component';
 import { ClickedDataService } from '../../services/clicked-data.service';
-import { Router } from '@angular/router';
 import { NavigationService } from '../../services/navigation.service';
 import { DataService } from '../../services/data.service';
+import { DetailedData } from '../../interfaces/detailed-data.interface';
+import { ArtObject } from '../../interfaces/artObject.interface';
+import { Data } from '../../interfaces/data.interface';
 
 @Component({
   selector: 'app-main-content',
@@ -18,42 +20,36 @@ import { DataService } from '../../services/data.service';
   styleUrls: ['./main-content.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MainContentComponent implements AfterViewInit, OnDestroy {
   public headerImage = NetworkQueries.HEADER_IMAGE;
   public url = NetworkQueries.URL;
   public artObjects = NetworkQueries.ART_OBJECTS;
   public count = NetworkQueries.COUNT;
-  public search = NetworkQueries.SEARCH;
-  public sort = NetworkQueries.SORT;
 
   public displayData: boolean;
-  public clickedArtObject;
-  public detailsObject;
+  public clickedArtObject: ArtObject;
+  public detailsObject: DetailedData;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   public pageSizeOptions = [10, 20, 50, 100];
-  public query: any;
+  public query: Data;
   public initialNumOfPages = this.dataService.initialNumOfPages;
   public initialResPerPage = this.dataService.initialResPerPage;
 
   private onDestroy$: Subject<void> = new Subject<void>();
 
   constructor(
-    public networkService: NetworkService,
-    public formValuesService: FormValuesService,
-    public matDialog: MatDialog,
+    private networkService: NetworkService,
+    private formValuesService: FormValuesService,
+    private matDialog: MatDialog,
     private clickedDataService: ClickedDataService,
     private navigationService: NavigationService,
     private dataService: DataService,
   ) {}
 
-  ngOnInit(): void {}
-
   ngAfterViewInit(): void {
-    // this.paginator.pageIndex = 1;
-
     this.paginator.page.pipe(
-      tap(() => this.loadDataPage()),
+      tap(() => this.loadDataPage().subscribe(query => this.query = query)),
       tap(() => this.navigateMainPage().subscribe()),
       takeUntil(this.onDestroy$),
     ).subscribe();
@@ -72,14 +68,14 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  public loadDataPage() {
+  public loadDataPage(): Observable<any> {
     return this.getFormData().pipe(
       take(1),
       takeUntil(this.onDestroy$),
-    ).subscribe(query => this.query = query);
+    );
   }
 
-  public navigateMainPage() {
+  public navigateMainPage(): Observable<any> {
     return this.formValuesService.getValues$().pipe(
       tap(response => {
         if (!response) {
@@ -91,10 +87,10 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
           );
         } else {
           this.navigationService.navigateMain(
-            response[this.search],
+            response[NetworkQueries.SEARCH],
             this.paginator.pageIndex,
             this.paginator.pageSize,
-            response[this.sort],
+            response[NetworkQueries.SORT],
           );
         }
       }),
@@ -102,7 +98,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  public getFormData() {
+  public getFormData(): Observable<any> {
     return this.formValuesService.getValues$().pipe(
       mergeMap(response => {
         if (!response) {
@@ -114,23 +110,23 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
           );
         } else {
           return this.networkService.getQuery(
-            response[this.search],
+            response[NetworkQueries.SEARCH],
             this.paginator.pageIndex,
             this.paginator.pageSize,
-            response[this.sort],
+            response[NetworkQueries.SORT],
           );
         }
       }),
     );
   }
 
-  public toggleDataDisplay() {
+  public toggleDataDisplay(): void {
     if (this.query !== undefined && this.query !== null) {
       this.query.count === 0 ? this.displayData = false : this.displayData = true;
     }
   }
 
-  public getDetailedData(event) {
+  public getDetailedData(event): void {
     this.query.artObjects.map(clickedObject => {
       if (event.target.currentSrc === clickedObject.headerImage.url) {
         this.clickedArtObject = clickedObject;
@@ -146,7 +142,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  public openPopup() {
+  public openPopup(): void {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = false;

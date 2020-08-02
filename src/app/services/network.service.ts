@@ -31,7 +31,7 @@ export class NetworkService {
     );
   }
 
-  public getDetailedQuery(objectNumber: string): Observable<any> {
+  public getDetailedQuery(objectNumber: string): Observable<object> {
     return this.http.get(
       `https://www.rijksmuseum.nl/api/en/collection/${objectNumber}`, {
         params: new HttpParams()

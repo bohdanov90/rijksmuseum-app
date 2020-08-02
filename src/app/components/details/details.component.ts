@@ -5,6 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { NavigationService } from '../../services/navigation.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
 import { DataService } from '../../services/data.service';
+import { DetailedData } from '../../interfaces/detailed-data.interface';
 
 @Component({
   selector: 'app-details',
@@ -12,7 +13,7 @@ import { DataService } from '../../services/data.service';
   styleUrls: ['./details.component.scss']
 })
 export class DetailsComponent implements OnInit, OnDestroy {
-  public details;
+  public details: DetailedData;
   private onDestroy$: Subject<void> = new Subject<void>();
 
   constructor(
@@ -22,7 +23,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
     ) {}
 
   ngOnInit(): void {
-    this.clickedDataService.getValues$().pipe(takeUntil(this.onDestroy$)).subscribe(details => this.details = details);
+    this.clickedDataService.getValues$()
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe((details: DetailedData) => this.details = details);
   }
 
   ngOnDestroy(): void {
@@ -30,7 +33,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  public backToMain() {
+  public backToMain(): void {
     this.navigationService.navigateMain(
       '',
       this.dataService.initialNumOfPages,

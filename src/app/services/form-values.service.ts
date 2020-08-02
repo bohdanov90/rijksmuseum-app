@@ -5,11 +5,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class FormValuesService {
-  public formValues$: BehaviorSubject<string> = new BehaviorSubject(null);
+  private formValues$: BehaviorSubject<string> = new BehaviorSubject(null);
 
-  constructor() {}
-
-  setValues(data: any): void {
+  setValues(data): void {
     this.formValues$.next(data);
   }
 
