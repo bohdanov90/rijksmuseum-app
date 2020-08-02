@@ -154,8 +154,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public openDialog() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = true;
-    dialogConfig.hasBackdrop = true;
+    dialogConfig.autoFocus = false;
     dialogConfig.closeOnNavigation = true;
     dialogConfig.data = this.detailsObject;
 

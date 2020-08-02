@@ -1,9 +1,5 @@
-.mat-dialog-content {
-  width: 80vw;
-  height: 80vh;
-}
-
 .img {
-  width: 80%;
-  height: auto;
+  max-height: 100%;
+  width: 100%;
+  object-fit: cover;
 }

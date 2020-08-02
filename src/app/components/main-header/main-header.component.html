@@ -1,11 +1,12 @@
-<form [formGroup]='form' (ngSubmit)='submitForm()'>
-  <select formControlName="sort">
+<form [formGroup]='form' (ngSubmit)='submitForm()' class="d-flex justify-content-between m-3">
+  <select formControlName="sort" class="custom-select w-25 ml-3 my-3 mr-5">
     <option *ngFor='let value of sortValues' [value]='value.apiName'>{{ value.displayName }}</option>
   </select>
   <input
+    class="form-control w-50 my-3 mx-5"
     type="text"
     name="search"
     formControlName="search"
     placeholder="Search keyword...">
-  <button type='submit'>Search</button>
+  <button type='submit' class="btn btn-danger w-25 mr-3 my-3 ml-5">Search</button>
 </form>

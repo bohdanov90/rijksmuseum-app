@@ -1,9 +1,9 @@
-<h2 mat-dialog-title> {{ title }} </h2>>
-<mat-dialog-content class='mat-dialog-content'>
-  <div><img src='{{ webImage }}' alt="" class="img"></div>
-  <div>{{ description }}</div>
+<h2 mat-dialog-title class="text-center"> {{ title }} </h2>
+<mat-dialog-content class='d-flex flex-row'>
+  <div class="w-75 h-100 m-2 p-1"><img src='{{ webImage }}' alt="" class="img"></div>
+  <div class="w-25 h-100 m-2 p-1 text-justify">{{ description }}</div>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button class="mat-raised-button" (click)='viewDetails()'>View more details</button>
-  <button class="mat-raised-button" (click)='closePopup()'>Close</button>
+<mat-dialog-actions class="d-flex flex-row justify-content-around">
+  <button type="button" class="btn btn-outline-secondary" (click)='viewDetails()'>View more details</button>
+  <button type="button" class="btn btn-outline-secondary" (click)='closePopup()'>Close</button>
 </mat-dialog-actions>
