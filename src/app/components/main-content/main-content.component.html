@@ -9,10 +9,9 @@
       class="mat-grid-tile"
       (click)='getDetailedData($event)'>
       <mat-card style="width: 150px" class="mat-card">
-        <div class="mat-card-image" (mouseenter)='onHover()' (mouseleave)='offHover()'>
+        <div class="mat-card-image" [matTooltip]='artObject.longTitle' matTooltipClass='mat-tooltip'>
           <img mat-card-image src="{{ artObject[headerImage][url] }}" alt="" class="image">
         </div>
-        <div class="mat-tooltip" *ngIf='displayOnHover === true'>{{ artObject.longTitle }}</div>
       </mat-card>
     </mat-grid-tile>
   </mat-grid-list>

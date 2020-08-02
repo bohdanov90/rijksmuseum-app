@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { Subject } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
@@ -15,7 +15,8 @@ import { NavigationService } from '../../services/navigation.service';
 @Component({
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
-  styleUrls: ['./main-content.component.scss']
+  styleUrls: ['./main-content.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public headerImage = NetworkQueries.HEADER_IMAGE;
@@ -35,7 +36,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public initialNumOfPages = this.dataSourceService.initialNumOfPages;
   public initialResPerPage = this.dataSourceService.initialResPerPage;
 
-  public displayOnHover = false;
   public clickedArtObject;
   public detailsObject;
 
@@ -133,14 +133,6 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.data !== undefined && this.data !== null) {
       this.data.count === 0 ? this.displayData = false : this.displayData = true;
     }
-  }
-
-  public onHover() {
-    this.displayOnHover = true;
-  }
-
-  public offHover() {
-    this.displayOnHover = false;
   }
 
   public getDetailedData(event) {
