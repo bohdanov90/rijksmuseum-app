@@ -1,6 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NavigationService } from '../../services/navigation.service';
+import { NetworkQueries } from '../../enums/network-queries.enum';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-popup',
@@ -8,17 +10,16 @@ import { NavigationService } from '../../services/navigation.service';
   styleUrls: ['./popup.component.scss']
 })
 export class PopupComponent implements OnInit {
+  public details;
   public title: string;
   public webImage: string;
   public description: string;
 
-  public details;
-
   constructor(
     private dialogRef: MatDialogRef<any>,
     private navigationService: NavigationService,
+    private dataService: DataService,
     @Inject(MAT_DIALOG_DATA) data) {
-    // console.log('DATA', data);
     this.details = data?.artObject;
     this.title = data?.artObject?.title;
     this.webImage = data?.artObject?.webImage?.url;
@@ -29,11 +30,15 @@ export class PopupComponent implements OnInit {
 
   viewDetails() {
     this.dialogRef.close();
-    // console.log(this.details);
     if (this.details !== null && this.details !== undefined) {
       this.navigationService.navigateDetails(this.details.objectNumber);
     } else {
-      this.navigationService.navigateMain('', 0, 10, 'relevance');
+      this.navigationService.navigateMain(
+        '',
+        this.dataService.initialNumOfPages,
+        this.dataService.initialResPerPage,
+        NetworkQueries.RELEVANCE,
+      );
     }
   }
 

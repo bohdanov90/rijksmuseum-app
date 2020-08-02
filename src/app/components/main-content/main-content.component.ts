@@ -10,6 +10,7 @@ import { PopupComponent } from '../popup/popup.component';
 import { ClickedDataService } from '../../services/clicked-data.service';
 import { Router } from '@angular/router';
 import { NavigationService } from '../../services/navigation.service';
+import { DataService } from '../../services/data.service';
 
 @Component({
   selector: 'app-main-content',
@@ -26,26 +27,24 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public sort = NetworkQueries.SORT;
 
   public displayData: boolean;
+  public clickedArtObject;
+  public detailsObject;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   public pageSizeOptions = [10, 20, 50, 100];
   public query: any;
-  public initialNumOfPages = 1;
-  public initialResPerPage = 10;
-
-  public clickedArtObject;
-  public detailsObject;
+  public initialNumOfPages = this.dataService.initialNumOfPages;
+  public initialResPerPage = this.dataService.initialResPerPage;
 
   private onDestroy$: Subject<void> = new Subject<void>();
 
   constructor(
     public networkService: NetworkService,
     public formValuesService: FormValuesService,
-    // public dataSourceService: DataSourceService,
     public matDialog: MatDialog,
     private clickedDataService: ClickedDataService,
-    private router: Router,
     private navigationService: NavigationService,
+    private dataService: DataService,
   ) {}
 
   ngOnInit(): void {}
@@ -99,6 +98,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
           );
         }
       }),
+      takeUntil(this.onDestroy$),
     );
   }
 
@@ -131,22 +131,22 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public getDetailedData(event) {
-    this.query.artObjects.map(el => {
-      if (event.target.currentSrc === el.headerImage.url) {
-        this.clickedArtObject = el;
+    this.query.artObjects.map(clickedObject => {
+      if (event.target.currentSrc === clickedObject.headerImage.url) {
+        this.clickedArtObject = clickedObject;
       }
     });
 
     this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).pipe(
       takeUntil(this.onDestroy$),
-    ).subscribe(el => {
-      this.detailsObject = el;
-      this.openDialog();
-      return this.clickedDataService.setValues(el);
+    ).subscribe(detailsObject => {
+      this.detailsObject = detailsObject;
+      this.openPopup();
+      return this.clickedDataService.setValues(detailsObject);
     });
   }
 
-  public openDialog() {
+  public openPopup() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = false;
