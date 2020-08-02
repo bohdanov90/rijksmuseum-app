@@ -11,6 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material/material.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { PopupComponent } from './components/popup/popup.component';
+import { DetailsComponent } from './components/details/details.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { PopupComponent } from './components/popup/popup.component';
     MainHeaderComponent,
     MainContentComponent,
     PopupComponent,
+    DetailsComponent,
   ],
   imports: [
     BrowserModule,

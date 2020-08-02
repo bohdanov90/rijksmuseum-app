@@ -1,8 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-import { Routing } from '../../enums/routing.enum';
 import { ClickedDataService } from '../../services/clicked-data.service';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-popup',
@@ -18,8 +17,8 @@ export class PopupComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<any>,
-    private router: Router,
     private clickedDataService: ClickedDataService,
+    private navigationService: NavigationService,
     @Inject(MAT_DIALOG_DATA) clickedArtObject,
     ) {
     this.title = clickedArtObject.title;
@@ -34,11 +33,14 @@ export class PopupComponent implements OnInit {
   viewDetails() {
     this.dialogRef.close();
     // console.log(this.clickedObject);
-    this.router.navigate([`/api/en/collection/${this.clickedObject.objectNumber}`]);
+    if (this.clickedObject !== null && this.clickedObject !== undefined) {
+      this.navigationService.navigateDetails(this.clickedObject.objectNumber);
+    } else {
+      this.navigationService.navigateMain('', 0, 10, 'relevance');
+    }
   }
 
   closePopup() {
     this.dialogRef.close();
-    // this.router.navigate([Routing.MAIN]);
   }
 }

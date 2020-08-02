@@ -2,13 +2,15 @@ import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular
 import { Subject } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
-import { tap, takeUntil, mergeMap, take, catchError } from 'rxjs/operators';
+import { tap, takeUntil, mergeMap, take } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { DataSourceService } from 'src/app/services/data-source.service';
 import { FormValuesService } from '../../services/form-values.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PopupComponent } from '../popup/popup.component';
 import { ClickedDataService } from '../../services/clicked-data.service';
+import { Router } from '@angular/router';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-main-content',
@@ -44,24 +46,27 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     public dataSourceService: DataSourceService,
     public matDialog: MatDialog,
     private clickedDataService: ClickedDataService,
+    private router: Router,
+    private navigationService: NavigationService,
   ) {}
 
   ngOnInit(): void {
-    this.dataSource = new DataSourceService(this.networkService, this.formValuesService);
+    this.dataSource = new DataSourceService(this.networkService, this.formValuesService, this.router);
   }
 
   ngAfterViewInit(): void {
     this.paginator.page.pipe(
       tap(() => this.loadDataPage()),
+      tap(() => this.navigateMainPage().subscribe()),
       takeUntil(this.onDestroy$),
     ).subscribe();
 
     this.getFormData().pipe(
       takeUntil(this.onDestroy$),
     ).subscribe(el => {
-        this.data = el;
-        this.toggleDataDisplay();
-        this.paginator.pageIndex = 0;
+      this.paginator.pageIndex = 0;
+      this.data = el;
+      this.toggleDataDisplay();
     });
   }
 
@@ -74,7 +79,29 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.getFormData().pipe(
       take(1),
       takeUntil(this.onDestroy$),
-      ).subscribe(el => this.data = el);
+    ).subscribe(el => this.data = el);
+  }
+
+  public navigateMainPage() {
+    return this.formValuesService.getValues$().pipe(
+      tap(response => {
+        if (!response) {
+          this.navigationService.navigateMain(
+            '',
+            this.paginator.pageIndex,
+            this.paginator.pageSize,
+            this.formValuesService.sortValues[0].apiName
+          );
+        } else {
+          this.navigationService.navigateMain(
+            response[this.search],
+            this.paginator.pageIndex,
+            this.paginator.pageSize,
+            response[this.sort],
+          );
+        }
+      }),
+    );
   }
 
   public getFormData() {
@@ -88,7 +115,12 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
             this.formValuesService.sortValues[0].apiName
           );
         } else {
-          return this.dataSource.loadData(response[this.search], this.paginator.pageIndex, this.paginator.pageSize, response[this.sort]);
+          return this.dataSource.loadData(
+            response[this.search],
+            this.paginator.pageIndex,
+            this.paginator.pageSize,
+            response[this.sort],
+          );
         }
       }),
     );

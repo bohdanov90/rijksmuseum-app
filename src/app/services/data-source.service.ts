@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { DataSource } from '@angular/cdk/table';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { NetworkService } from './network.service';
-import { catchError, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { CollectionViewer } from '@angular/cdk/collections';
 import { FormValuesService } from './form-values.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class DataSourceService extends DataSource<any> {
   constructor(
     public networkService: NetworkService,
     public formValuesService: FormValuesService,
+    public router: Router,
   ) {
     super();
   }
