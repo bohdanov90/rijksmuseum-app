@@ -1,12 +1,9 @@
 .mat-tooltip {
-
-}
-
-.mat-card {
-  overflow: hidden;
+  position: relative;
+  bottom: 7vh;
+  font-size: x-small;
 }
 
 .mat-card-image {
-  height: 100%;
   object-fit: cover;
 }

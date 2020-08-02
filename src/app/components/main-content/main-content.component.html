@@ -3,14 +3,14 @@
 </div>
 
 <ng-template #displayDataBlock>
-  <mat-grid-list cols='6' gutterSize='1vw' class="mat-grid-list my-3 mx-4">
+  <mat-grid-list cols='6' gutterSize='1vw' rowHeight='10vh' class="mat-grid-list my-3 mx-4">
     <mat-grid-tile
       *ngFor="let artObject of data?.artObjects"
-      class="mat-grid-tile h-25"
+      class="mat-grid-tile"
       (click)='getDetailedData($event)'
       [matTooltip]='artObject.longTitle'
       matTooltipClass='mat-tooltip'>
-      <mat-card class="mat-card w-100 h-100 p-1 my-5 d-flex align-items-center">
+      <mat-card class="mat-card w-100 h-100 my-1 d-flex align-items-center">
         <img mat-card-image src="{{ artObject[headerImage][url] }}" alt="" class="mat-card-image p-1 my-5">
       </mat-card>
     </mat-grid-tile>
