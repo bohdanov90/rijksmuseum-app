@@ -7,8 +7,7 @@
     <mat-grid-tile
       *ngFor="let artObject of data?.artObjects"
       class="mat-grid-tile"
-      (click)='getDetailedData($event)'
-      (click)='openDialog()'>
+      (click)='getDetailedData($event)'>
       <mat-card style="width: 150px" class="mat-card">
         <div class="mat-card-image" (mouseenter)='onHover()' (mouseleave)='offHover()'>
           <img mat-card-image src="{{ artObject[headerImage][url] }}" alt="" class="image">

@@ -13,28 +13,29 @@ export class PopupComponent implements OnInit {
   public webImage: string;
   public description: string;
 
-  public clickedObject;
+  public details;
 
   constructor(
     private dialogRef: MatDialogRef<any>,
     private clickedDataService: ClickedDataService,
     private navigationService: NavigationService,
-    @Inject(MAT_DIALOG_DATA) clickedArtObject,
-    ) {
-    this.title = clickedArtObject.title;
-    this.webImage = clickedArtObject.webImage.url;
-    this.description = clickedArtObject.description;
+    @Inject(MAT_DIALOG_DATA) data) {
+    // console.log('DATA', data);
+    this.details = data?.artObject;
+    this.title = data?.artObject?.title;
+    this.webImage = data?.artObject?.webImage?.url;
+    this.description = data?.artObject?.description;
   }
 
   ngOnInit(): void {
-    this.clickedDataService.getValues$().subscribe(object => this.clickedObject = object);
+    // this.clickedDataService.getValues$().subscribe(object => this.details = object);
   }
 
   viewDetails() {
     this.dialogRef.close();
-    // console.log(this.clickedObject);
-    if (this.clickedObject !== null && this.clickedObject !== undefined) {
-      this.navigationService.navigateDetails(this.clickedObject.objectNumber);
+    // console.log(this.details);
+    if (this.details !== null && this.details !== undefined) {
+      this.navigationService.navigateDetails(this.details.objectNumber);
     } else {
       this.navigationService.navigateMain('', 0, 10, 'relevance');
     }

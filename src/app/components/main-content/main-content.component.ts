@@ -37,6 +37,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public displayOnHover = false;
   public clickedArtObject;
+  public detailsObject;
 
   private onDestroy$: Subject<void> = new Subject<void>();
 
@@ -55,6 +56,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    // this.paginator.pageIndex = 1;
+
     this.paginator.page.pipe(
       tap(() => this.loadDataPage()),
       tap(() => this.navigateMainPage().subscribe()),
@@ -144,13 +147,16 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.data.artObjects.map(el => {
       if (event.target.currentSrc === el.headerImage.url) {
         this.clickedArtObject = el;
-        this.clickedDataService.setValues(el);
       }
     });
 
     this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).pipe(
       takeUntil(this.onDestroy$),
-    ).subscribe();
+    ).subscribe(el => {
+      this.detailsObject = el;
+      this.openDialog();
+      return this.clickedDataService.setValues(el);
+    });
   }
 
   public openDialog() {
@@ -159,7 +165,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogConfig.autoFocus = true;
     dialogConfig.hasBackdrop = true;
     dialogConfig.closeOnNavigation = true;
-    dialogConfig.data = this.clickedArtObject;
+    dialogConfig.data = this.detailsObject;
 
     this.matDialog.open(PopupComponent, dialogConfig);
   }

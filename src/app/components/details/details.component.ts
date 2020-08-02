@@ -7,13 +7,13 @@ import { ClickedDataService } from '../../services/clicked-data.service';
   styleUrls: ['./details.component.scss']
 })
 export class DetailsComponent implements OnInit {
-  public artObject;
+  public details;
 
   constructor(private clickedDataService: ClickedDataService) {}
 
   ngOnInit(): void {
-    this.clickedDataService.getValues$().subscribe(object => this.artObject = object);
-    console.log(this.artObject);
+    this.clickedDataService.getValues$().subscribe(response => this.details = response);
+    // console.log(this.details);
   }
 
 }

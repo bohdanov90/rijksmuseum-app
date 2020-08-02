@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class DataSourceService extends DataSource<any> {
-  public initialNumOfPages = 0;
+  public initialNumOfPages = 1;
   public initialResPerPage = 10;
 
   private dataSubject$: BehaviorSubject<any> = new BehaviorSubject<any>([]);

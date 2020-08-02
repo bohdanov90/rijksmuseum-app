@@ -1,14 +1,8 @@
-<div>title: {{ artObject?.title }}</div>
-
-<div>description: {{ artObject?.description }}</div>
-
-<div>principalMaker: {{ artObject?.principalMaker }}</div>
-
-<div>dating: {{ artObject?.dating?.presentingDate }}</div>
-
-<div>category: </div>
-
-<div>tags: </div>
-
-<img src='{{ artObject?.webImage?.url }}' alt='' class="img">
+<div><b>title</b>: {{ details?.artObject?.title }}</div>
+<div><b>description</b>: {{ details?.artObject?.description }}</div>
+<div><b>principalMaker</b>: {{ details?.artObject?.principalMaker }}</div>
+<div><b>dating</b>: {{ details?.artObject?.dating?.presentingDate }}</div>
+<div><b>category</b>: ???</div>
+<div *ngFor='let tag of details?.artObjectPage?.tags'><b>tags</b>: {{ tag }}</div>
+<img src='{{ details?.artObject?.webImage?.url }}' alt='' class="img">
 
