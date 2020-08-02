@@ -4,7 +4,6 @@ import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
 import { tap, takeUntil, mergeMap, take } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
-import { DataSourceService } from 'src/app/services/data-source.service';
 import { FormValuesService } from '../../services/form-values.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { PopupComponent } from '../popup/popup.component';
@@ -26,15 +25,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public search = NetworkQueries.SEARCH;
   public sort = NetworkQueries.SORT;
 
-  public sortValues = this.formValuesService.sortValues;
   public displayData: boolean;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  public dataSource: DataSourceService;
   public pageSizeOptions = [10, 20, 50, 100];
-  public data: any;
-  public initialNumOfPages = this.dataSourceService.initialNumOfPages;
-  public initialResPerPage = this.dataSourceService.initialResPerPage;
+  public query: any;
+  public initialNumOfPages = 1;
+  public initialResPerPage = 10;
 
   public clickedArtObject;
   public detailsObject;
@@ -44,16 +41,14 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     public networkService: NetworkService,
     public formValuesService: FormValuesService,
-    public dataSourceService: DataSourceService,
+    // public dataSourceService: DataSourceService,
     public matDialog: MatDialog,
     private clickedDataService: ClickedDataService,
     private router: Router,
     private navigationService: NavigationService,
   ) {}
 
-  ngOnInit(): void {
-    this.dataSource = new DataSourceService(this.networkService, this.formValuesService, this.router);
-  }
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     // this.paginator.pageIndex = 1;
@@ -66,9 +61,9 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.getFormData().pipe(
       takeUntil(this.onDestroy$),
-    ).subscribe(el => {
+    ).subscribe(query => {
       this.paginator.pageIndex = 0;
-      this.data = el;
+      this.query = query;
       this.toggleDataDisplay();
     });
   }
@@ -82,7 +77,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.getFormData().pipe(
       take(1),
       takeUntil(this.onDestroy$),
-    ).subscribe(el => this.data = el);
+    ).subscribe(query => this.query = query);
   }
 
   public navigateMainPage() {
@@ -93,7 +88,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
             '',
             this.paginator.pageIndex,
             this.paginator.pageSize,
-            this.formValuesService.sortValues[0].apiName
+            NetworkQueries.RELEVANCE
           );
         } else {
           this.navigationService.navigateMain(
@@ -111,14 +106,14 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.formValuesService.getValues$().pipe(
       mergeMap(response => {
         if (!response) {
-          return this.dataSource.loadData(
+          return this.networkService.getQuery(
             '',
             this.paginator.pageIndex,
             this.paginator.pageSize,
-            this.formValuesService.sortValues[0].apiName
+            NetworkQueries.RELEVANCE
           );
         } else {
-          return this.dataSource.loadData(
+          return this.networkService.getQuery(
             response[this.search],
             this.paginator.pageIndex,
             this.paginator.pageSize,
@@ -130,13 +125,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public toggleDataDisplay() {
-    if (this.data !== undefined && this.data !== null) {
-      this.data.count === 0 ? this.displayData = false : this.displayData = true;
+    if (this.query !== undefined && this.query !== null) {
+      this.query.count === 0 ? this.displayData = false : this.displayData = true;
     }
   }
 
   public getDetailedData(event) {
-    this.data.artObjects.map(el => {
+    this.query.artObjects.map(el => {
       if (event.target.currentSrc === el.headerImage.url) {
         this.clickedArtObject = el;
       }

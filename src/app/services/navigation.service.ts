@@ -7,7 +7,6 @@ import { Routing } from '../enums/routing.enum';
   providedIn: 'root'
 })
 export class NavigationService {
-
   constructor(
     private networkService: NetworkService,
     private router: Router,

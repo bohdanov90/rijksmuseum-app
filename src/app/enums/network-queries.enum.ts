@@ -5,4 +5,5 @@ export enum NetworkQueries {
   COUNT = 'count',
   SEARCH = 'search',
   SORT = 'sort',
+  RELEVANCE = 'relevance',
 }

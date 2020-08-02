@@ -1,11 +1,11 @@
-<div *ngIf='displayData === false; else displayDataBlock'>
+<div *ngIf='displayData === false; else displayDataBlock' class="text-center">
   No art object could be found by your query
 </div>
 
 <ng-template #displayDataBlock>
   <mat-grid-list cols='6' gutterSize='1vw' rowHeight='10vh' class="mat-grid-list my-3 mx-4">
     <mat-grid-tile
-      *ngFor="let artObject of data?.artObjects"
+      *ngFor="let artObject of query?.artObjects"
       class="mat-grid-tile"
       (click)='getDetailedData($event)'
       [matTooltip]='artObject.longTitle'
@@ -18,9 +18,8 @@
 </ng-template>
 
 <mat-paginator
-  [length]='data?.count'
+  [length]='query?.count'
   [pageIndex]='initialNumOfPages'
   [pageSize]='initialResPerPage'
-  [pageSizeOptions]='pageSizeOptions'
-  showFirstLastButtons>
+  [pageSizeOptions]='pageSizeOptions'>
 </mat-paginator>

@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ClickedDataService } from '../../services/clicked-data.service';
 import { NavigationService } from '../../services/navigation.service';
 
 @Component({
@@ -17,7 +16,6 @@ export class PopupComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<any>,
-    private clickedDataService: ClickedDataService,
     private navigationService: NavigationService,
     @Inject(MAT_DIALOG_DATA) data) {
     // console.log('DATA', data);
@@ -27,9 +25,7 @@ export class PopupComponent implements OnInit {
     this.description = data?.artObject?.description;
   }
 
-  ngOnInit(): void {
-    // this.clickedDataService.getValues$().subscribe(object => this.details = object);
-  }
+  ngOnInit(): void {}
 
   viewDetails() {
     this.dialogRef.close();
