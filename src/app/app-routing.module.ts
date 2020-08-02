@@ -9,6 +9,7 @@ const routes: Routes = [
   { path: Routing.MAIN, component: MainComponent },
   { path: Routing.DETAILS, component: DetailsComponent, },
   { path: '**', redirectTo: Routing.MAIN },
+  { path: '', component: MainComponent },
 ];
 
 @NgModule({
