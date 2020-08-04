@@ -9,4 +9,5 @@ export interface ArtObjects {
   headerImage: {
     url: string;
   };
+  hasImage: boolean;
 }

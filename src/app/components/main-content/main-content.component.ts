@@ -2,7 +2,7 @@ import { Component, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation, OnIn
 import { Subject, Observable } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
-import { takeUntil, mergeMap, switchMap, tap, take } from 'rxjs/operators';
+import { takeUntil, switchMap, tap } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { FormValuesService } from '../../services/form-values.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -57,14 +57,12 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.getQueryDataBasedOnFormData().subscribe(query => {
-      console.log('getQueryDataBasedOnFormData', query.artObjects[0].title);
       this.paginator.pageIndex = 0;
       this.query = query;
       this.toggleDataDisplay();
     });
 
     this.detectPaginatorClick().subscribe(query => {
-      console.log('detectPaginatorClick', query.artObjects[0].title);
       this.navigateMainPageBasedOnFormData();
       this.query = query;
     });
@@ -101,6 +99,8 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public getDetailedQueryData(event): void {
     this.query.artObjects.map(clickedObject => {
       if (event.target.currentSrc === clickedObject.headerImage.url) {
+        this.clickedArtObject = clickedObject;
+      } else if (clickedObject.hasImage === false) {
         this.clickedArtObject = clickedObject;
       }
     });
