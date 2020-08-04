@@ -1,4 +1,4 @@
-import { Component, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation, OnInit } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
@@ -20,7 +20,7 @@ import { Data } from '../../interfaces/data.interface';
   styleUrls: ['./main-content.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class MainContentComponent implements AfterViewInit, OnDestroy {
+export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public headerImage = NetworkQueries.HEADER_IMAGE;
   public url = NetworkQueries.URL;
   public artObjects = NetworkQueries.ART_OBJECTS;
@@ -46,6 +46,12 @@ export class MainContentComponent implements AfterViewInit, OnDestroy {
     private navigationService: NavigationService,
     private dataService: DataService,
   ) {}
+
+  ngOnInit() {
+    this.navigationService.navigateMain(
+      '', this.dataService.initialNumOfPages, this.dataService.initialResPerPage, NetworkQueries.RELEVANCE
+    );
+  }
 
   ngAfterViewInit(): void {
     this.paginator.page.pipe(
