@@ -7,7 +7,7 @@
     <mat-grid-tile
       *ngFor="let artObject of query?.artObjects"
       class="mat-grid-tile"
-      (click)='getDetailedData($event)'
+      (click)='getDetailedQueryData($event)'
       [matTooltip]='artObject.longTitle'
       matTooltipClass='mat-tooltip'>
       <mat-card class="mat-card w-100 h-100 my-1 d-flex align-items-center">

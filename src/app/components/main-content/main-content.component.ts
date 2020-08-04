@@ -2,7 +2,7 @@ import { Component, ViewChild, AfterViewInit, OnDestroy, ViewEncapsulation, OnIn
 import { Subject, Observable } from 'rxjs';
 import { NetworkService } from '../../services/network.service';
 import { NetworkQueries } from '../../enums/network-queries.enum';
-import { tap, takeUntil, mergeMap, take } from 'rxjs/operators';
+import { takeUntil, mergeMap, switchMap, tap, take } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { FormValuesService } from '../../services/form-values.service';
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
@@ -29,12 +29,13 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   public displayData: boolean;
   public clickedArtObject: ArtObject;
   public detailsObject: DetailedData;
+  public formValues;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   public pageSizeOptions = [10, 20, 50, 100];
   public query: Data;
-  public initialNumOfPages = this.dataService.initialNumOfPages;
-  public initialResPerPage = this.dataService.initialResPerPage;
+  public initialNumOfPages = 0;
+  public initialResPerPage = 10;
 
   private onDestroy$: Subject<void> = new Subject<void>();
 
@@ -48,24 +49,24 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.navigationService.navigateMain(
-      '', this.dataService.initialNumOfPages, this.dataService.initialResPerPage, NetworkQueries.RELEVANCE
-    );
+    this.navigateInitial();
+    this.formValuesService.getValues$()
+      .pipe(takeUntil(this.onDestroy$))
+      .subscribe(formValues => this.formValues = formValues);
   }
 
   ngAfterViewInit(): void {
-    this.paginator.page.pipe(
-      tap(() => this.loadDataPage().subscribe(query => this.query = query)),
-      tap(() => this.navigateMainPage().subscribe()),
-      takeUntil(this.onDestroy$),
-    ).subscribe();
-
-    this.getFormData().pipe(
-      takeUntil(this.onDestroy$),
-    ).subscribe(query => {
+    this.getQueryDataBasedOnFormData().subscribe(query => {
+      console.log('getQueryDataBasedOnFormData', query.artObjects[0].title);
       this.paginator.pageIndex = 0;
       this.query = query;
       this.toggleDataDisplay();
+    });
+
+    this.detectPaginatorClick().subscribe(query => {
+      console.log('detectPaginatorClick', query.artObjects[0].title);
+      this.navigateMainPageBasedOnFormData();
+      this.query = query;
     });
   }
 
@@ -74,27 +75,20 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     this.onDestroy$.complete();
   }
 
-  public loadDataPage(): Observable<any> {
-    return this.getFormData().pipe(
-      take(1),
-      takeUntil(this.onDestroy$),
-    );
-  }
-
-  public navigateMainPage(): Observable<any> {
+  public getQueryDataBasedOnFormData(): Observable<any> {
     return this.formValuesService.getValues$().pipe(
-      tap(response => {
+      switchMap(response => {
         if (!response) {
-          this.navigationService.navigateMain(
+          return this.networkService.getQuery(
             '',
-            this.paginator.pageIndex,
+            this.paginator.pageIndex + 1,
             this.paginator.pageSize,
             NetworkQueries.RELEVANCE
           );
         } else {
-          this.navigationService.navigateMain(
+          return this.networkService.getQuery(
             response[NetworkQueries.SEARCH],
-            this.paginator.pageIndex,
+            this.paginator.pageIndex + 1,
             this.paginator.pageSize,
             response[NetworkQueries.SORT],
           );
@@ -104,35 +98,7 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
 
-  public getFormData(): Observable<any> {
-    return this.formValuesService.getValues$().pipe(
-      mergeMap(response => {
-        if (!response) {
-          return this.networkService.getQuery(
-            '',
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
-            NetworkQueries.RELEVANCE
-          );
-        } else {
-          return this.networkService.getQuery(
-            response[NetworkQueries.SEARCH],
-            this.paginator.pageIndex,
-            this.paginator.pageSize,
-            response[NetworkQueries.SORT],
-          );
-        }
-      }),
-    );
-  }
-
-  public toggleDataDisplay(): void {
-    if (this.query !== undefined && this.query !== null) {
-      this.query.count === 0 ? this.displayData = false : this.displayData = true;
-    }
-  }
-
-  public getDetailedData(event): void {
+  public getDetailedQueryData(event): void {
     this.query.artObjects.map(clickedObject => {
       if (event.target.currentSrc === clickedObject.headerImage.url) {
         this.clickedArtObject = clickedObject;
@@ -140,12 +106,50 @@ export class MainContentComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.networkService.getDetailedQuery(this.clickedArtObject.objectNumber).pipe(
+      tap(detailsObject => {
+        this.detailsObject = detailsObject;
+        this.openPopup();
+        this.clickedDataService.setValues(detailsObject);
+      }),
       takeUntil(this.onDestroy$),
-    ).subscribe(detailsObject => {
-      this.detailsObject = detailsObject;
-      this.openPopup();
-      return this.clickedDataService.setValues(detailsObject);
-    });
+    ).subscribe();
+  }
+
+  public navigateInitial(): void {
+    this.navigationService.navigateMain(
+      '', this.dataService.initialNumOfPages, this.dataService.initialResPerPage, NetworkQueries.RELEVANCE
+    );
+  }
+
+  public navigateMainPageBasedOnFormData(): void {
+    if (!!this.formValues) {
+      this.navigationService.navigateMain(
+        this.formValues[NetworkQueries.SEARCH],
+        this.paginator.pageIndex + 1,
+        this.paginator.pageSize,
+        this.formValues[NetworkQueries.SORT],
+      );
+    } else {
+      this.navigationService.navigateMain(
+        '',
+        this.paginator.pageIndex + 1,
+        this.paginator.pageSize,
+        NetworkQueries.RELEVANCE
+      );
+    }
+  }
+
+  public detectPaginatorClick() {
+    return this.paginator.page.pipe(
+      switchMap(() => this.getQueryDataBasedOnFormData()),
+      takeUntil(this.onDestroy$),
+    );
+  }
+
+  public toggleDataDisplay(): void {
+    if (this.query !== undefined && this.query !== null) {
+      this.query.count === 0 ? this.displayData = false : this.displayData = true;
+    }
   }
 
   public openPopup(): void {

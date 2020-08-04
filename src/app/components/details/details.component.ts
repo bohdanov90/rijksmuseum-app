@@ -1,7 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ClickedDataService } from '../../services/clicked-data.service';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { NavigationService } from '../../services/navigation.service';
 import { DataService } from '../../services/data.service';
 import { DetailedData } from '../../interfaces/detailed-data.interface';
@@ -12,9 +11,8 @@ import { NetworkQueries } from 'src/app/enums/network-queries.enum';
   templateUrl: './details.component.html',
   styleUrls: ['./details.component.scss']
 })
-export class DetailsComponent implements OnInit, OnDestroy {
-  public detailedData: DetailedData;
-  private onDestroy$: Subject<void> = new Subject<void>();
+export class DetailsComponent implements OnInit {
+  public detailedData$: Observable<DetailedData>;
 
   constructor(
     private clickedDataService: ClickedDataService,
@@ -23,14 +21,7 @@ export class DetailsComponent implements OnInit, OnDestroy {
     ) {}
 
   ngOnInit(): void {
-    this.clickedDataService.getValues$()
-      .pipe(takeUntil(this.onDestroy$))
-      .subscribe((detailedData: DetailedData) => this.detailedData = detailedData);
-  }
-
-  ngOnDestroy(): void {
-    this.onDestroy$.next();
-    this.onDestroy$.complete();
+    this.detailedData$ = this.clickedDataService.getValues$();
   }
 
   public backToMain(): void {

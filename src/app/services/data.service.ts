@@ -14,6 +14,6 @@ export class DataService {
       apiName: 'objecttype',
     },
   ];
-  public initialNumOfPages = 0;
+  public initialNumOfPages = 1;
   public initialResPerPage = 10;
 }
